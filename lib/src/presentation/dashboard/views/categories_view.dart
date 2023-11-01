@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_test/src/core/consts/color_palette.dart';
 import 'package:task_test/src/core/consts/icons.dart';
-import 'package:task_test/src/data/model/category_model.dart';
+import 'package:task_test/src/presentation/dashboard/cubit/get_users_cubit/get_users_cubit.dart';
 
 class CategoriesView extends StatelessWidget {
-  const CategoriesView({super.key, required this.categories});
-
-  final List<Category> categories;
+  const CategoriesView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -45,57 +44,87 @@ class CategoriesView extends StatelessWidget {
             ],
           ),
         ),
-        ListView.separated(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemBuilder: (context, index) => InkWell(
-            onTap: () {},
-            child: Container(
-              width: MediaQuery.sizeOf(context).width,
-              height: 48,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-              ),
-              decoration: BoxDecoration(
-                color: ColorPalette.pureWhite,
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 3,
-                    spreadRadius: 0,
-                    offset: const Offset(0, 2),
-                    color: ColorPalette.darkShadow,
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Image.asset(
-                    categories[index].icon,
-                  ),
-                  const SizedBox(
-                    width: 8,
-                  ),
-                  Text(
-                    categories[index].name,
+        BlocBuilder<GetUsersCubit, GetUsersState>(
+          builder: (context, state) {
+            final loading = state is GetUsersLoadingState;
+            final error = state is GetUsersErrorState;
+            final cubit = GetUsersCubit.get(context);
+            return error
+                ? Text(
+                    state.message,
                     style: const TextStyle(
-                      fontWeight: FontWeight.w400,
+                      fontSize: 15,
                       fontFamily: "Outfit",
-                      fontSize: 16,
-                      color: ColorPalette.brightBlack,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.red,
                     ),
-                  ),
-                  const Spacer(),
-                  Image.asset(
-                    MyIcons.icArrowForward,
                   )
-                ],
-              ),
-            ),
-          ),
-          separatorBuilder: (context, index) => const SizedBox(
-            height: 16,
-          ),
-          itemCount: categories.length,
+                : loading
+                    ? const SizedBox(
+                        height: 80,
+                        child: Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      )
+                    : ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemBuilder: (context, index) => InkWell(
+                          onTap: () {},
+                          child: Container(
+                            width: MediaQuery.sizeOf(context).width,
+                            height: 48,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                            ),
+                            decoration: BoxDecoration(
+                              color: ColorPalette.pureWhite,
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 3,
+                                  spreadRadius: 0,
+                                  offset: const Offset(0, 2),
+                                  color: ColorPalette.darkShadow,
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Text(
+                                  cubit.users[index].id.toString(),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontFamily: "Outfit",
+                                    fontSize: 15,
+                                    color: ColorPalette.primaryColor,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 8,
+                                ),
+                                Text(
+                                  cubit.users[index].name,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w400,
+                                    fontFamily: "Outfit",
+                                    fontSize: 16,
+                                    color: ColorPalette.brightBlack,
+                                  ),
+                                ),
+                                const Spacer(),
+                                Image.asset(
+                                  MyIcons.icArrowForward,
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                        separatorBuilder: (context, index) => const SizedBox(
+                          height: 16,
+                        ),
+                        itemCount: cubit.users.length,
+                      );
+          },
         ),
       ],
     );

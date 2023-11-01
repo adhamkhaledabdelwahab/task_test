@@ -2,9 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_test/src/core/consts/color_palette.dart';
-import 'package:task_test/src/core/consts/dymmy_data.dart';
 import 'package:task_test/src/core/consts/icons.dart';
+import 'package:task_test/src/presentation/dashboard/cubit/get_users_cubit/get_users_cubit.dart';
 import 'package:task_test/src/presentation/dashboard/views/app_bar_view.dart';
 import 'package:task_test/src/presentation/dashboard/views/bottom_view.dart';
 import 'package:task_test/src/presentation/dashboard/views/categories_view.dart';
@@ -25,15 +26,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final PageController _controller = PageController();
   final _tabs = ["Categories", "Services", "Orders (0)"];
   final _tabsView = [
-    CategoriesView(
-      categories: categories,
-    ),
+    const CategoriesView(),
     const SizedBox(
       height: 100,
     ),
     const OrdersView(),
   ];
-
   final _sliderSize = 3;
 
   @override
@@ -66,76 +64,79 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: ColorPalette.pureWhite,
-        selectedItemColor: ColorPalette.primaryColor,
-        unselectedItemColor: ColorPalette.chromatic200,
-        selectedFontSize: 15,
-        unselectedFontSize: 15,
-        showSelectedLabels: true,
-        showUnselectedLabels: true,
-        selectedLabelStyle: const TextStyle(
-          fontFamily: "Outfit",
-          fontWeight: FontWeight.w400,
-        ),
-        unselectedLabelStyle: const TextStyle(
-          fontFamily: "Outfit",
-          fontWeight: FontWeight.w400,
-        ),
-        items: [
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              MyIcons.icHome,
-            ),
-            label: "Home",
+    return BlocProvider(
+      create: (context) => GetUsersCubit()..getUsers(),
+      child: Scaffold(
+        bottomNavigationBar: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: ColorPalette.pureWhite,
+          selectedItemColor: ColorPalette.primaryColor,
+          unselectedItemColor: ColorPalette.chromatic200,
+          selectedFontSize: 15,
+          unselectedFontSize: 15,
+          showSelectedLabels: true,
+          showUnselectedLabels: true,
+          selectedLabelStyle: const TextStyle(
+            fontFamily: "Outfit",
+            fontWeight: FontWeight.w400,
           ),
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              MyIcons.icSupportAgent,
-            ),
-            label: "Assets",
+          unselectedLabelStyle: const TextStyle(
+            fontFamily: "Outfit",
+            fontWeight: FontWeight.w400,
           ),
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              MyIcons.icDashboardCustomize,
-            ),
-            label: "Support",
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              MyIcons.icPerson,
-            ),
-            label: "Profile",
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const AppBarView(),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  children: [
-                    const HeaderView(),
-                    SliderView(
-                      controller: _controller,
-                      sliderNotifier: _sliderNotifier,
-                      length: _sliderSize,
-                    ),
-                    BottomView(
-                      tabs: _tabs,
-                      tabNotifier: _tabNotifier,
-                      tabsView: _tabsView,
-                    ),
-                  ],
-                ),
+          items: [
+            BottomNavigationBarItem(
+              icon: Image.asset(
+                MyIcons.icHome,
               ),
-            ],
+              label: "Home",
+            ),
+            BottomNavigationBarItem(
+              icon: Image.asset(
+                MyIcons.icSupportAgent,
+              ),
+              label: "Assets",
+            ),
+            BottomNavigationBarItem(
+              icon: Image.asset(
+                MyIcons.icDashboardCustomize,
+              ),
+              label: "Support",
+            ),
+            BottomNavigationBarItem(
+              icon: Image.asset(
+                MyIcons.icPerson,
+              ),
+              label: "Profile",
+            ),
+          ],
+        ),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const AppBarView(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    children: [
+                      const HeaderView(),
+                      SliderView(
+                        controller: _controller,
+                        sliderNotifier: _sliderNotifier,
+                        length: _sliderSize,
+                      ),
+                      BottomView(
+                        tabs: _tabs,
+                        tabNotifier: _tabNotifier,
+                        tabsView: _tabsView,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
